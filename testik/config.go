@@ -7,9 +7,9 @@ import (
 )
 
 type Config struct {
-	UseCache bool
+	UseCache        bool
 	CacheExpiration int
-	DNSServer string
+	DNSServer       string
 }
 
 func GetConfig() (Config, error) {
@@ -25,11 +25,10 @@ func GetConfig() (Config, error) {
 	} else if strings.Contains(dnsServer, ":") {
 		dnsServer += ":53"
 	}
-	
 
 	return Config{
-		UseCache: present,
+		UseCache:        present,
 		CacheExpiration: cacheExpiration,
-		DNSServer: dnsServer,
+		DNSServer:       dnsServer,
 	}, nil
 }
