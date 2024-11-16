@@ -17,22 +17,30 @@ func GetRequestInfo(request *dns.Msg, response *dns.Msg, clientAddr string, star
 		clientIP = clientAddr
 	}
 
+	var answers []string
+	var destIP string
+	if len(response.Answer) > 0 {
+		for _, ans := range response.Answer {
+			answers = append(answers, ans.String())
+			switch v := ans.(type) {
+			case *dns.A:
+				destIP = v.A.String()
+			case *dns.AAAA:
+				destIP = v.AAAA.String()
+			}
+		}
+	}
+
 	logData := map[string]interface{}{
 		"timestamp":        startTime.Format(time.RFC3339),
 		"client_ip":        clientIP,
+		"dest_ip":          destIP,
 		"query_name":       request.Question[0].Name,
 		"query_type":       dns.TypeToString[request.Question[0].Qtype],
 		"protocol":         "udp",
 		"response_code":    dns.RcodeToString[response.Rcode],
 		"response_time_ms": duration.Milliseconds(),
-	}
-
-	if len(response.Answer) > 0 {
-		var answers []string
-		for _, ans := range response.Answer {
-			answers = append(answers, ans.String())
-		}
-		logData["answers"] = answers
+		"answers":          answers,
 	}
 
 	return logData
