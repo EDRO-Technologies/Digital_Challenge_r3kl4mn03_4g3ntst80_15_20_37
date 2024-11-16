@@ -23,7 +23,7 @@ func main() {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			_, _, err := dnsClient.Exchange(msg, "10.0.2.15:53")
+			_, _, err := dnsClient.Exchange(msg, "192.168.1.114:53")
 			if err != nil {
 				panic(err)
 			}
