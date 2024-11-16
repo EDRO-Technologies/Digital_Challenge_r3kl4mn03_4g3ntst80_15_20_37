@@ -10,8 +10,7 @@ func processRequest(dnsClient *dns.Client, request *dns.Msg, config Config) (*dn
 	switch request.Opcode {
 	case dns.OpcodeQuery:
 		if len(request.Question) > 0 {
-			dnsServer := config.DNSServer
-			response, _, err := dnsClient.Exchange(request, dnsServer)
+			response, _, err := dnsClient.Exchange(request, config.DNSServer)
 			if err != nil {
 				return nil, err
 			}
