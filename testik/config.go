@@ -14,6 +14,7 @@ type Config struct {
 	CacheExpiration int64
 	DNSServer       string
 	LogstashAddr    string
+	SQLiteEnabled   bool
 }
 
 func GetOutboundIP() net.IP {
@@ -33,11 +34,13 @@ func GetConfig() (Config, error) {
 		host = GetOutboundIP().String() + ":53"
 	}
 
-	cacheExpirationString, present := os.LookupEnv("CacheExpiration")
+	cacheExpirationString, cacheEnabled := os.LookupEnv("CacheExpiration")
 	var cacheExpiration int64
 	var err error
-	if present {
+	if cacheEnabled && cacheExpirationString != "" {
 		cacheExpiration, err = strconv.ParseInt(cacheExpirationString, 10, 64)
+	} else {
+		cacheEnabled = false
 	}
 	if err != nil {
 		return Config{}, err
@@ -55,11 +58,17 @@ func GetConfig() (Config, error) {
 		logstashAddr = "localhost:50000"
 	}
 
+	SQLiteEnabledString, SQLiteEnabled := os.LookupEnv("SQLiteEnabled")
+	if SQLiteEnabledString == "" && SQLiteEnabled {
+		SQLiteEnabled = false
+	}
+
 	return Config{
 		Host:            host,
-		UseCache:        present,
+		UseCache:        cacheEnabled,
 		CacheExpiration: cacheExpiration * 1000000000,
 		DNSServer:       dnsServer,
 		LogstashAddr:    logstashAddr,
+		SQLiteEnabled:   SQLiteEnabled,
 	}, nil
 }

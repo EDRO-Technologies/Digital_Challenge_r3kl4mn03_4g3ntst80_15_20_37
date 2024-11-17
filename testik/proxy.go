@@ -45,7 +45,7 @@ func ProcessRequest(proxy *Proxy, request *dns.Msg, config Config) (*dns.Msg, er
 	case dns.OpcodeQuery:
 		if len(request.Question) > 0 {
 
-			response := GetCache(&proxy.cache, request, config)
+			response := GetCache(proxy.cache, request, config)
 			if response != nil {
 				return response, nil
 			}
@@ -55,7 +55,7 @@ func ProcessRequest(proxy *Proxy, request *dns.Msg, config Config) (*dns.Msg, er
 				return nil, err
 			}
 
-			SetCache(&proxy.cache, response, request.Question[0], config)
+			SetCache(proxy.cache, response, request.Question[0], config)
 
 			return response, nil
 		}

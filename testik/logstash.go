@@ -46,8 +46,8 @@ func GetRequestInfo(request *dns.Msg, response *dns.Msg, clientAddr string, star
 	return logData
 }
 
-func SendToLogstash(address string, data map[string]interface{}) error {
-	conn, err := net.Dial("tcp", address)
+func SendToLogstash(proxy *Proxy, data map[string]interface{}) error {
+	conn, err := net.Dial("tcp", proxy.config.LogstashAddr)
 	if err != nil {
 		return fmt.Errorf("error connecting to Logstash: %w", err)
 	}
@@ -69,4 +69,21 @@ func SendToLogstash(address string, data map[string]interface{}) error {
 	}
 
 	return nil
+}
+
+func LateSend(proxy *Proxy) {
+	if !proxy.config.SQLiteEnabled {
+		return
+	}
+	data, err := GetFirstLog(proxy)
+	if err != nil {
+		fmt.Printf("Error when getting FirstLog: %s\n", err)
+		return
+	}
+	fmt.Printf("SendLATA")
+	for len(data) != 0 {
+		SendToLogstash(proxy, data)
+		DeleteFirstLog(proxy)
+		data, _ = GetFirstLog(proxy)
+	}
 }
