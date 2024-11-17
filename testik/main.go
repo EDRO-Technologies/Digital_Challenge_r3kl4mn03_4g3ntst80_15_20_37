@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"time"
 
@@ -9,6 +10,8 @@ import (
 
 func main() {
 	config, err := GetConfig()
+	fmt.Printf("%v", config)
+
 	if err != nil {
 		panic(err)
 	}
@@ -16,12 +19,17 @@ func main() {
 	dnsClient := new(dns.Client)
 	dnsClient.Net = "udp"
 
+	var dnsCache Cache
+	if config.UseCache {
+		dnsCache = InitCache(config.CacheExpiration)
+	}
+
 	dns.HandleFunc(".", func(writer dns.ResponseWriter, request *dns.Msg) {
 		switch request.Opcode {
 		case dns.OpcodeQuery:
 			startTime := time.Now()
 
-			response, err := processRequest(dnsClient, request, config)
+			response, err := ProcessRequest(dnsClient, &dnsCache, request, config)
 			if err != nil {
 				log.Printf("Failed lookup for %s with error: %s\n", request, err.Error())
 			}

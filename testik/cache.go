@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"sync"
 	"time"
 )
@@ -25,7 +26,6 @@ func InitCache(expirationTime int64) Cache {
 
 func (cache *Cache) Get(k string) (interface{}, bool) {
 	cache.mutex.RLock()
-
 	element, found := cache.elements[k]
 	if !found {
 		cache.mutex.RUnlock()
@@ -44,7 +44,7 @@ func (cache *Cache) Get(k string) (interface{}, bool) {
 
 func (cache *Cache) Set(k string, v interface{}) {
 	cache.mutex.Lock()
-
+	
 	cache.elements[k] = Element{
 		Value:     v,
 		TimeAdded: time.Now().UnixNano(),

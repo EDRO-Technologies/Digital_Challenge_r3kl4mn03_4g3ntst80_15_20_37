@@ -11,7 +11,7 @@ import (
 type Config struct {
 	Host            string
 	UseCache        bool
-	CacheExpiration int
+	CacheExpiration int64
 	DNSServer       string
 	LogstashAddr    string
 }
@@ -34,10 +34,10 @@ func GetConfig() (Config, error) {
 	}
 
 	cacheExpirationString, present := os.LookupEnv("CacheExpiration")
-	var cacheExpiration int
+	var cacheExpiration int64
 	var err error
 	if present {
-		cacheExpiration, err = strconv.Atoi(cacheExpirationString)
+		cacheExpiration, err = strconv.ParseInt(cacheExpirationString, 10, 64)
 	}
 	if err != nil {
 		return Config{}, err
@@ -58,7 +58,7 @@ func GetConfig() (Config, error) {
 	return Config{
 		Host:            host,
 		UseCache:        present,
-		CacheExpiration: cacheExpiration,
+		CacheExpiration: cacheExpiration * 1000000000,
 		DNSServer:       dnsServer,
 		LogstashAddr:    logstashAddr,
 	}, nil

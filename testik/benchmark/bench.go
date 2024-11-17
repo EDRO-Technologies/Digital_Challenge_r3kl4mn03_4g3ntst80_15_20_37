@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	N := 1000
+	N := 100
 	start := time.Now()
 	dnsClient := new(dns.Client)
 	msg := new(dns.Msg)
