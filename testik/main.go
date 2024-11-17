@@ -10,7 +10,6 @@ import (
 
 func main() {
 	config, err := GetConfig()
-	fmt.Printf("%v", config)
 
 	if err != nil {
 		panic(err)
